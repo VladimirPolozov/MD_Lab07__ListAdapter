@@ -1,13 +1,13 @@
 package com.example.md_lab07__listadapter
 
 import android.os.Bundle
-import android.widget.Button
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
@@ -18,8 +18,6 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import timber.log.Timber
-import java.net.HttpURLConnection
-import java.net.URL
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +39,6 @@ class MainActivity : AppCompatActivity() {
         val adapter = ContactAdapter(emptyList())
         rView.adapter = adapter
 
-        val searchButton: Button = findViewById(R.id.btn_search)
         val editTextField: EditText = findViewById(R.id.et_search)
         var contactsList = emptyList<Contact>()
 
@@ -60,12 +57,28 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        searchButton.setOnClickListener {
-            val searchText = editTextField.text.toString()
-            val filteredContacts = contactsList.filter { contact ->
-                contact.name.contains(searchText, true) || contact.phone.contains(searchText)
+        editTextField.addTextChangedListener(object : TextWatcher {
+
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val filteredContactsList = filter(contactsList, s.toString())
+                adapter.updateContacts(filteredContactsList)
             }
-            adapter.updateContacts(filteredContacts)
+        })
+    }
+
+    private fun filter(list: List<Contact>, query: String): List<Contact> {
+        return if (query.isEmpty()) {
+            list
+        } else {
+            list.filter {
+                it.name.contains(query, ignoreCase = true) ||
+                        it.phone.contains(query) ||
+                        it.type.contains(query, ignoreCase = true)
+            }
         }
     }
 }

@@ -8,30 +8,16 @@
     tools:context=".MainActivity"
     android:padding="25dp">
 
-    <EditText
-        android:id="@+id/et_search"
+    <include
+        layout="@layout/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:autofillHints=""
-        android:inputType=""
-        tools:ignore="LabelFor"
-        android:fontFamily="Montserrat-Regular"
-        android:textAlignment="center"
-        android:layout_marginBottom="5dp"
-        />
-
-    <Button
-        android:id="@+id/btn_search"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Найти"
-        android:layout_marginBottom="25dp"
-        />
+        android:layout_height="75dp"
+        android:layout_marginBottom="25dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
     </androidx.recyclerview.widget.RecyclerView>
 
 </LinearLayout>
