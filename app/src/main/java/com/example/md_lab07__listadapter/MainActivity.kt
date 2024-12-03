@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         Timber.plant(Timber.DebugTree())
+        val sharedPref = getSharedPreferences("app_preferences", MODE_PRIVATE)
         val client = OkHttpClient()
         val request = Request.Builder().url("https://drive.google.com/u/0/uc?id=1-KO-9GA3NzSgIc1dkAsNm8Dqw0fuPxcR&export=download").build()
 
@@ -56,7 +57,9 @@ class MainActivity : AppCompatActivity() {
                 contactsList = Gson().fromJson(json, Array<Contact>::class.java).toList()
 
                 withContext(Dispatchers.Main) {
-                    adapter.submitList(contactsList)
+                    val savedQuery = sharedPref.getString("SEARCH_FILTER", "")
+                    editTextField.setText(savedQuery)
+                    adapter.submitList(filter(contactsList, savedQuery?:""))
                 }
             } catch (e: Exception) {
                 Timber.e(e)
@@ -65,7 +68,9 @@ class MainActivity : AppCompatActivity() {
 
         editTextField.addTextChangedListener(object : TextWatcher {
 
-            override fun afterTextChanged(s: Editable?) {}
+            override fun afterTextChanged(s: Editable?) {
+                sharedPref.edit().putString("SEARCH_FILTER", editTextField.text.toString()).apply()
+            }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
