@@ -1,5 +1,7 @@
 package com.example.md_lab07__listadapter
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -36,7 +38,11 @@ class MainActivity : AppCompatActivity() {
 
         val rView: RecyclerView = findViewById(R.id.rView)
         rView.layoutManager = LinearLayoutManager(this)
-        val adapter = ContactAdapter(emptyList())
+        val adapter = ContactAdapter { contact ->
+            val dial = Intent(Intent.ACTION_DIAL)
+            dial.data = Uri.parse("tel:${contact.phone}")
+            startActivity(dial)
+        }
         rView.adapter = adapter
 
         val editTextField: EditText = findViewById(R.id.et_search)
@@ -50,7 +56,7 @@ class MainActivity : AppCompatActivity() {
                 contactsList = Gson().fromJson(json, Array<Contact>::class.java).toList()
 
                 withContext(Dispatchers.Main) {
-                    adapter.updateContacts(contactsList)
+                    adapter.submitList(contactsList)
                 }
             } catch (e: Exception) {
                 Timber.e(e)
@@ -64,8 +70,7 @@ class MainActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val filteredContactsList = filter(contactsList, s.toString())
-                adapter.updateContacts(filteredContactsList)
+                adapter.submitList(filter(contactsList, s.toString()))
             }
         })
     }
